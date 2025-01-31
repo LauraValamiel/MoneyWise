@@ -10,13 +10,13 @@ O trabalho final tem como tema o desenvolvimento de um sistema web para gestão 
 # 2. Escopo
 Este projeto terá as seguintes funcionalidades:
 - Login
-° Cadastrar usuário
-° Cadastro de receitas e despesas
-° Exibição do saldo atual, receita e despesas
-° Visualizar resumo do mês
-° Visualizar despesas por categoria e evolução das despesas
-° Visualizar resumo financeiro detalhado
-° Visualizar orçamento mensal e relatório
+- Cadastrar usuário
+- Cadastro de receitas e despesas
+- Exibição do saldo atual, receita e despesas
+- Visualizar resumo do mês
+- Visualizar despesas por categoria e evolução das despesas
+- Visualizar resumo financeiro detalhado
+- Visualizar orçamento mensal e relatório
 # 3. Restrições
 Neste trabalho não serão considerados integrações com bancos, funcionalidades de investimentos e suporte a múltipls moedas.
 # 4. Protótipo
