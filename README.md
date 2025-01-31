@@ -9,7 +9,7 @@ A aplicação, permite uma melhor organização financeira, ajudando os usuário
 O trabalho final tem como tema o desenvolvimento de um sistema web para gestão de finanças pessoais. 
 # 2. Escopo
 Este projeto terá as seguintes funcionalidades:
-° Login
+- Login
 ° Cadastrar usuário
 ° Cadastro de receitas e despesas
 ° Exibição do saldo atual, receita e despesas
@@ -21,4 +21,4 @@ Este projeto terá as seguintes funcionalidades:
 Neste trabalho não serão considerados integrações com bancos, funcionalidades de investimentos e suporte a múltipls moedas.
 # 4. Protótipo
 Protótipos para as páginas principal, de login, de cadastro, do perfil, inicial, para adicionar novas despesas/receitas, de resumo financeiro, de orçamento mensal e relatório, foram elaborados, e podem ser encontrados em: 
-/https://www.figma.com/design/Z2biODhrdTH4x5PkzJew9P/MoneyWise?node-id=0-1&t=UBTFDDDqHPlKj3we-1
+https://www.figma.com/design/Z2biODhrdTH4x5PkzJew9P/MoneyWise?node-id=0-1&t=UBTFDDDqHPlKj3we-1
