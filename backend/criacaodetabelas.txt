@@ -1,0 +1,87 @@
+-----------------Criando tabelas-----------------------
+
+CREATE TABLE cliente (
+ Nome varchar(50) NOT NULL, 
+ Email varchar(40) NOT NULL,
+ CPF varchar(11) PRIMARY KEY NOT NULL,
+ Telefone varchar(40) NOT NULL,
+ Senha varchar(10) NOT NULL
+);
+
+CREATE TABLE receita_despesa (
+ Id serial PRIMARY KEY,
+ Tipo varchar(30) NOT NULL,
+ Valor decimal(10,2) NOT NULL,
+ Descricao varchar(50) NOT NULL,
+ Categoria varchar(30) NOT NULL,
+ Data date NOT NULL
+ Cliente varchar(11) NOT NULL,
+ FOREING KEY (cliente) REFERENCES cliente (cpf) ON DELETE CASCADE
+);
+
+-------------------Consultando tabelas----------------
+
+--Consulta de saldo atual--
+SELECT SUM(Valor)
+FROM receita_despesa 
+WHERE Cliente = '' AND Tipo = 'Despesa'
+
+SELECT SUM(Valor)
+FROM receita_despesa
+WHERE Cliente = '' AND Tipo = 'Receita' 
+
+
+--Receita--
+SELECT SUM(Valor)
+FROM receita_despesa
+WHERE Cliente = '' AND Tipo = 'Receita' 
+
+--Despesa--
+SELECT SUM(Valor)
+FROM  receita_despesa
+WHERE Cliente = '' AND Tipo = 'Despesa' 
+
+--Resumo do mês--
+SELECT SUM(Valor)
+FROM receita_despesa
+WHERE EXTRACT(MONTH FROM Data) = '' AND Cliente = '' AND Tipo = 'Receita'
+
+SELECT SUM(Valor)
+FROM receita_despesa
+WHERE EXTRACT(MONTH FROM Data) = '' AND Cliente = '' AND Tipo = 'Despesa' 
+
+--Despesas por categoria--
+SELECT SUM(Valor)
+FROM receita_despesa
+WHERE categoria = '' AND Cliente = '' AND Tipo = 'Receita'
+
+SELECT SUM(Valor)
+FROM receita_despesa
+WHERE categoria = '' AND Cliente = '' AND Tipo = 'Despesa' 
+
+--Resumo financeiro--
+SELECT *
+FROM receita_despesa
+WHERE EXTRACT(MONTH FROM Data) = '' AND Cliente = ''
+
+--Orçamento mensal--
+SELECT SUM(Valor)
+FROM receita_despesa
+WHERE EXTRACT(MONTH FROM Data) = '' AND Cliente = '' AND Tipo = 'Despesa' 
+
+
+--Relatório por categoria--
+SELECT SUM(Valor)
+FROM receita_despesa
+WHERE EXTRACT(MONTH FROM Data) = '' categoria = '' AND Cliente = '' AND Tipo = 'Despesa'
+
+
+instalar axios(front), flask(back)
+
+rotas em java
+
+npx create-next-app@latest web-next.js
+
+
+
+
