@@ -22,7 +22,8 @@ export const EditarPerfil = () => {
         throw new Error("StoreContext deve ser usado dentro de um Provider");
     }
 
-    const { setToken, setCpf, setNome, nome } = context;
+    const { setToken, setCpf, cpf, setNome, nome } = context;
+    const cpfCerto = cpf[0].toString();
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -31,18 +32,27 @@ export const EditarPerfil = () => {
         nome: '',
         email: '',
         n_celular: '',
+        cpf: cpfCerto,
 
    })
 
-   console.log("Nome: " + nome);
+   /*console.log("Nome: " + nome);*/
 
    useEffect(() => {
     setFormData((prevData) => ({
         ...prevData,
-        nome: nome || "",  
+        nome: nome || "",
+        cpf: cpfCerto  
     }));
-}, [nome]);
+    }, [nome, cpfCerto]);
 
+    const handleLogout = () => {
+        event.preventDefault(); // Impede o envio do formulário
+    event.stopPropagation();
+        localStorage.removeItem('userToken'); // Remove token do usuário
+        localStorage.removeItem('userData');  // Remove dados do usuário
+        navigate('/MoneyWise'); // Redireciona para a tela de login
+    };
 
    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -57,15 +67,23 @@ export const EditarPerfil = () => {
         axios.post('http://127.0.0.1:5000/api/editarCliente', formData)
         .then(response => {
         console.log(response.data);
-        if(response.data.error != true){
-            setNome(response.data.data.nome);
-            setCpf(response.data.data.cpf);
-            setToken("1");
-            navigate('/EditarPerfil');
-            window.alert("Os dados foram atualizados");
-        } else {
-            window.alert("Erro ao fazer login! " + response.data.message);
+        if (!response.data || response.data.error){
+            window.alert("Erro ao atualizar o perfil: " + (response.data?.message || "Erro desconhecido"));
         }
+
+        const data = response.data.data;
+        
+        if (data){
+            setNome(data.nome || "");
+            setCpf(data.cpf || "");
+
+        }else{
+            console.warn("Dados não retornados pela api.");
+        }
+        setToken("1");
+        navigate('/EditarPerfil');
+        window.alert("Os dados foram atualizados");
+       
         
         })
         .catch(error => {
@@ -73,7 +91,7 @@ export const EditarPerfil = () => {
         });
     }
     
-    console.log("Nome: " + nome);
+    /*console.log("Nome: " + nome);*/
           
 
     return(
@@ -81,7 +99,7 @@ export const EditarPerfil = () => {
              <div className="sidebar">
             <button onClick={() => navigate('/EditarPerfil')} className="button"><img src={perfil} className='adicionar'/></button>
             <button onClick={() => navigate('/Home')} className="button"><img src={home} className='adicionar'/></button>
-            <button onClick={() => navigate('/AdicionarReceitaDespesa')} className="button"><img src={adicionar} className='adicionar'/></button>
+            <button onClick={() => navigate('/adicionarReceitaOuDespesa')} className="button"><img src={adicionar} className='adicionar'/></button>
             <button onClick={() => navigate('/ResumoFinanceiro')} className="button"><img src={resume} className='adicionar'/></button>
             <button onClick={() => navigate('/OrcamentoMensalERelatorio')} className="button"><img src={relatorio} className='adicionar'/></button>
 
@@ -118,7 +136,8 @@ export const EditarPerfil = () => {
                             value={formData.n_celular}
                             onChange={handleInputChange} />
                     </label>
-                    <button type="submit" className=" button-editar"> Sair </button>
+                    <button type="submit" className="button-editar"> Salvar </button>
+                    <button onClick={handleLogout} className="button-logout">Logout</button>
                     </div>
                 </form>
 

@@ -66,22 +66,42 @@
     /*width: calc(400px + 2vmin);*/
     width: 250px;
     justify-content: center;
+    align-self: flex-start;
+
+  }
+
+  .button-logout{
+    font-size: calc(4px + 2vmin);
+    font-family: Monserrat ;
+    background: #F5EFE7;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border-color: #3E5879;
+    text-align: center;
+    color: #213555;
+    font-weight: bold;
+    margin-top: -70px;
+    margin-bottom: 20px;
+    display: flex;
+    /*width: calc(400px + 2vmin);*/
+    width: 250px;
+    justify-content: center;
     align-self: flex-end;
 
   }
 
-  .button-editar:hover {
+  .button-editar:hover, .button-logout:hover {
     background-color: #F5EFE7;
     transform: scale(1.1);
     /*box-shadow: 0 0 15px #F5EFE7;*/
   }
   
   /* Efeito ao clicar */
-  .button-editar:active {
+  .button-editar:active, .button-logout:active {
     transform: scale(0.95);
   }
   
   /* Remove o contorno quando o botão recebe foco */
-  .button-editar:focus {
+  .button-editar:focus, .button-logout:focus {
     outline: none;
   }

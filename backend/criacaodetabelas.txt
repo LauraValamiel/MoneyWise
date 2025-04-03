@@ -13,12 +13,11 @@ CREATE TABLE receita_despesa (
  Tipo varchar(30) NOT NULL,
  Valor decimal(10,2) NOT NULL,
  Descricao varchar(50) NOT NULL,
- Categoria varchar(30) NOT NULL,
- Data date NOT NULL
+ Categoria varchar(30),
+ Data date NOT NULL,
  Cliente varchar(11) NOT NULL,
- FOREING KEY (cliente) REFERENCES cliente (cpf) ON DELETE CASCADE
+ FOREIGN KEY (cliente) REFERENCES cliente (cpf) ON DELETE CASCADE
 );
-
 -------------------Consultando tabelas----------------
 
 --Consulta de saldo atual--

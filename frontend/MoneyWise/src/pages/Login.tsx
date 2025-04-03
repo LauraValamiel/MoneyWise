@@ -43,6 +43,10 @@ export const Login = () => {
         if(response.data.error != true){
             const nomeRecebido = response.data.data.nome;
             const nomeCorreto = typeof nomeRecebido === "object" ? nomeRecebido[0] : nomeRecebido;
+            
+            console.log("🔹 Nome recebido:", nomeCorreto);
+            console.log("🔹 CPF recebido:", response.data.data.cpf.toString());
+            
             setNome(nomeCorreto);
             setCpf(response.data.data.cpf);
             setToken("1");

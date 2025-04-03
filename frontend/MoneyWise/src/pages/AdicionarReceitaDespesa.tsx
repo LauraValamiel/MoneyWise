@@ -25,9 +25,13 @@ export const AdicionarReceitaDespesa = () => {
         throw new Error("StoreContext deve ser usado dentro de um Provider");
     }
 
-    const { cpf } = context;
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { setToken, setNome, setCpf, cpf } = context;
 
+    console.log("CPF do contexto:", cpf[0]);
+    const cpfCerto = cpf[0].toString(); // Corrigindo o CPF para string
+    console.log("tipo CPF corrigido:", typeof cpfCerto);
+
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const getCurrentDate = (): string => {
         const today = new Date();
@@ -39,7 +43,8 @@ export const AdicionarReceitaDespesa = () => {
         valor: '',
         descricao: '',
         categoria: '',
-        data: getCurrentDate,
+        data: getCurrentDate(),
+        cpf: cpfCerto, // Inicializa com o valor de cpf do contexto
 
    })
 
@@ -56,20 +61,48 @@ export const AdicionarReceitaDespesa = () => {
         }));
    }
 
+    console.log("CPF antes do envio:", cpf);
+    console.log("Tipo do CPF:", typeof cpf);
+
+
    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         
+        if (formData.tipo === "Despesa" && formData.categoria === "") {
+            setErrorMessage("Por favor, selecione uma categoria para a despesa.");
+            return;
+        }
+
+        /*const cpfCorrigido = typeof cpf === "object" && cpf !== null 
+            ? Object.values(cpf)[0]?.toString() 
+            : cpf?.toString() || "";*/
+
+        const dataToSend = {
+            ...formData,
+            valor: Number(formData.valor),
+            cpf: cpfCerto, // ✅ Agora cpf é sempre uma string
+        };
+
+        
+        console.log("CPF corrigido antes do envio:", cpfCerto);
+        console.log("Tipo do CPF corrigido:", typeof cpfCerto);
+
+        //const dados = { tipos, valor, descricao, categoria, data, cpf };
+
+        console.log("🔹 Enviando dados para o backend:", dataToSend);
 
         try {
-            const response = await axios.post('http://127.0.0.1:5000/api/AdicionarReceitaDespesa', formData);
+            const response = await axios.post('http://127.0.0.1:5000/api/adicionarReceitaOuDespesa', dataToSend, {withCredentials: true});
             
-            console.log(response.data);
+            console.log("Resposta do backend:", response.data);
 
             if (response?.data?.error === false && response.data.data) {
-                    setNome(response.data.data.nome);
-                    setCpf(response.data.data.cpf);
-                    setToken("1");
-                    navigate("/Home");
+                //const cpfRecebido = response.data.data.cpf;
+                //const cpfCorreto = typeof cpfRecebido === "object" ? cpfRecebido[0] : cpfRecebido;
+                setNome(response.data.data.nome);
+                setCpf(response.data.data.cpfCerto);
+                setToken("1");
+                navigate("/Home");
             } else {
                     setErrorMessage(response.data?.mensagem || "Erro ao processar o cadastro.");
                 }
@@ -77,6 +110,8 @@ export const AdicionarReceitaDespesa = () => {
                 console.error("Erro ao enviar dados:", error);
                 setErrorMessage("Erro inesperado ao tentar cadastrar. Tente novamente.");
             }
+
+            
         
     }
     
@@ -87,7 +122,7 @@ export const AdicionarReceitaDespesa = () => {
              <div className="sidebar">
             <button onClick={() => navigate('/editarPerfil')} className="button"><img src={perfil} className='adicionar'/></button>
             <button onClick={() => navigate('/Home')} className="button"><img src={home} className='adicionar'/></button>
-            <button onClick={() => navigate('/AdicionarReceitaDespesa')} className="button"><img src={adicionar} className='adicionar'/></button>
+            <button onClick={() => navigate('/adicionarReceitaOuDespesa')} className="button"><img src={adicionar} className='adicionar'/></button>
             <button onClick={() => navigate('/ResumoFinanceiro')} className="button"><img src={resume} className='adicionar'/></button>
             <button onClick={() => navigate('/OrcamentoMensalERelatorio')} className="button"><img src={relatorio} className='adicionar'/></button>
 
@@ -122,7 +157,7 @@ export const AdicionarReceitaDespesa = () => {
                         <input
                             name="valor"
                             className='dadosLogin'
-                            value={formData.valor}
+                            value={formData.valor || ""}
                             onChange={handleInputChange}
                         />
                     </label>
@@ -146,7 +181,7 @@ export const AdicionarReceitaDespesa = () => {
                         Categoria:<br/>
                     <div className="seletores-adicionar">
                             {/* Seleção de Ano */}
-                            <select name="categoria" value={formData.categoria} onChange={handleInputChange} className="custom-select-adicionar">
+                            <select name="categoria" value={formData.categoria || ""} onChange={handleInputChange} className="custom-select-adicionar">
                                 <option value="">Categoria</option>
                             {categorias.map((categoriaOpcao) => (
                                 <option key={categoriaOpcao} value={categoriaOpcao}>

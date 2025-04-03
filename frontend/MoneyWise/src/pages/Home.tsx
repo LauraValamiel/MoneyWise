@@ -6,6 +6,7 @@ import StoreContext from '../components/store/Context';
 import useResumoFinanceiro from '../components/resumofinanceiroti.tsx';
 import ResumoMesAno from '../components/resumomes.tsx';
 import GraficosDespesas from '../components/graficodespesa.tsx';
+import EvolucaoDespesas from '../components/evolucaodespesa.tsx';
 import { useNavigate } from 'react-router-dom';
 import adicionar from "../imagens/adicionardespesareceita-bege.png"
 import perfil from "../imagens/perfil-bege.png"
@@ -35,7 +36,7 @@ export const Home = () => {
             <div className="sidebar">
             <button onClick={() => navigate('/editarPerfil')} className="button"><img src={perfil} className='adicionar'/></button>
             <button onClick={() => navigate('/Home')} className="button"><img src={home} className='adicionar'/></button>
-            <button onClick={() => navigate('/AdicionarReceitaDespesa')} className="button"><img src={adicionar} className='adicionar'/></button>
+            <button onClick={() => navigate('/adicionarReceitaOuDespesa')} className="button"><img src={adicionar} className='adicionar'/></button>
             <button onClick={() => navigate('/ResumoFinanceiro')} className="button"><img src={resume} className='adicionar'/></button>
             <button onClick={() => navigate('/OrcamentoMensalERelatorio')} className="button"><img src={relatorio} className='adicionar'/></button>
 
@@ -57,8 +58,13 @@ export const Home = () => {
                 )}
 
                 <ResumoMesAno/>
+                
+                <div className="container-graficos">
+                    <GraficosDespesas />
 
-                <GraficosDespesas />
+                    <EvolucaoDespesas />
+                </div>
+                
 
             </main>
 

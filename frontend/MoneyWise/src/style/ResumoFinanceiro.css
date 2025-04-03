@@ -69,26 +69,31 @@
 
 .selecao-container {
     display: flex;
-    align-items: flex-start; 
+    align-items: center; 
     flex-direction: row;
     justify-content: flex-start;
-    gap: 0px;
-    margin-bottom: 20px;
+    gap: 5px;
+    margin: 10px 0px;
+    padding-left: 10px;
     color: #F5EFE7;
     width: auto;
-    text-align: right;
+    text-align: left;
+    outline: 1px solid red; 
 }
 
 .selecao-container label {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: auto;
     color: #F5EFE7;
     font-size: 24px;
     gap: 5px;
-    text-align: right;
+    text-align: left;
     margin-right: 700px;
+    /*margin: 0px;*/
+    white-space: nowrap;
+    outline: 1px solid green;
 }
 
 .selecao-container select {
@@ -99,16 +104,18 @@
     display: inline-block;
     flex-direction: row;
     gap: 10px; 
-    margin-right: 0px;
+    margin: 0px;
     background-color: #F5EFE7;
     color: #213555;
     font-size: 18px;
     border: 2px solid #213555;
-    padding: 6px 10px;
+    padding: 5px 0px;
     border-radius: 5px;
     cursor: pointer;
     appearance: none;
     align-items: right;
+    width: auto;
+    min-width: 100px;
 }
 
 .selecao-container select:hover {
@@ -126,15 +133,16 @@
 .selecao-inputs {
     display: flex;
     align-items: center;
-    gap: 0px;
+    gap: 5px;
     justify-content: flex-start;
     width: auto;
-    margin-left: 150px;
+    margin: 0px;
     flex-wrap: nowrap;
+    outline: 1px solid red;
 }
 
 .selecao-inputs select {
-    padding: 6px 10px;
+    padding: 5px 0px;
     font-size: 18px;
     border: 2px solid #213555;
     border-radius: 5px;
@@ -143,9 +151,10 @@
     cursor: pointer;
     appearance: none;
     width: auto;
-    min-width: 90px; /* Ajuste conforme necessário */
+    /*min-width: 200px; /* Ajuste conforme necessário */
     padding: 5px;
     margin: 0;
+    outline: 1px solid blue;
 }
 
 .tabela-resumo {

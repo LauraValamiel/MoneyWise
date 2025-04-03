@@ -80,3 +80,8 @@
     margin-bottom: 5px;
   }
   
+  .escrita-cabecalho {
+    margin-right: auto;
+    height: 25px; /* Defina o tamanho adequado para a logo */
+    width: auto;
+  }

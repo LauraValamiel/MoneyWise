@@ -1,14 +1,20 @@
+import locale
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 import datetime
 import requests
 import json
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import psycopg2
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from flask import make_response
+from decimal import Decimal
+from flask import send_from_directory
 
 
 # Conexão com o banco de dados
@@ -17,8 +23,8 @@ class DatabaseConnection:
 
     def __new__(cls):
         if cls._instance is None:
+            cls._instance = super(DatabaseConnection, cls).__new__(cls)
             try:
-                cls._instance = super(DatabaseConnection, cls).__new__(cls)
                 cls._instance.connection = psycopg2.connect(
                     host='localhost',
                     database='MoneyWise',
@@ -28,7 +34,7 @@ class DatabaseConnection:
                 print("Conexão ao banco de dados estabelecida.")
             except Exception as e:
                 print(f"Erro ao conectar ao banco de dados: {e}")
-                cls._instance = None
+                cls._instance.connection = None
         return cls._instance
 
     def get_connection(self):
@@ -77,8 +83,10 @@ def consultar_db(query):
         return recset
     except Exception as e:
         print(f"Erro na consulta: {e}")
-        con.rollback()  # Rollback da transação em caso de erro
-        cur.close()
+        if con:
+             con.rollback() 
+        if cur:
+            cur.close()
         return []
 
 def inserir_db(query):
@@ -98,7 +106,9 @@ def inserir_db(query):
 
 # Inicializando o Flask
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["http://localhost:5173"])
+locale.setlocale(locale.LC_TIME, 'pt_BR.utf8')
+#CORS(app)
 #CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 
@@ -278,6 +288,16 @@ def evolucao_despesas(login):
 
 ################ ROTAS ################
 
+
+
+@app.after_request
+def apply_cors(response):
+    response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    return response
+
 @app.route('/api/login', methods=['POST'])
 def send_login():
     dados = request.json
@@ -342,51 +362,103 @@ def create_cliente():
 @app.route('/api/editarCliente', methods=['POST'])
 def edit_cliente(): #olhar de colocar o nome
     dados = request.json
-    nome = dados['nome']
-    email = dados['email']
-    cpf = dados['cpf']
-    telefone = dados['telefone']
+    print("Dados recebidos:", dados)
+    #nome = dados.get('nome', '')
+    #email = dados.get('email', '')
+    cpf = dados.get('cpf', '')
+    #telefone = dados.get('telefone', '')
 
     updates = {}
 
-    if(nome):
-        updates['nome'] = nome
-    if(email):
-        updates['email'] = email
-    if(telefone):
-        updates['telefone'] = telefone
+    if 'nome' in dados:
+        updates['nome'] = dados['nome']
+    if 'email' in dados:
+        updates['email'] = dados['email']
+    if 'telefone' in dados:
+        updates['telefone'] = dados['n_celular']
+
+    if not updates:
+        return jsonify({"error": True, "message": "Nenhum campo para atualizar"}), 400
+
 
     update_query = QueryFactory.update_query(
         table='cliente',
         updates=updates,
-        where_clause=f"cpf = '{cpf}' AND nome = '{nome}'"
+        where_clause=f"cpf = '{cpf}'"
     )
 
     inserir_db(update_query)
 
-    return jsonify(dados)
+    select_query = QueryFactory.select_query(
+        table='cliente',
+        columns='cpf, nome, email, telefone',
+        where_clause=f"cpf = '{cpf}'"
+    )
+    
+    resultado = consultar_db(select_query)
+
+    if not resultado:
+        return jsonify({"error": True, "message": "Erro ao recuperar dados atualizados"}), 500
+
+    cliente_atualizado = {
+        "cpf": resultado[0][0],
+        "nome": resultado[0][1],
+        "email": resultado[0][2],
+        "telefone": resultado[0][3],
+    }
+
+    return jsonify({
+        "error": False,
+        "message": "Dados atualizados com sucesso",
+        "data": cliente_atualizado
+    })
+
 
 @app.route('/api/adicionarReceitaOuDespesa', methods=['POST'])
 def adicionar_receita_despesa():
     dados = request.json
+    print("📥 Recebido do frontend:", dados)
+
+    #cpf = request.cookies.get('cpf')  # Aqui você deve obter o CPF do usuário logado
+    #print(f"cpf recebido: {cpf}")
+
+    cpf = dados['cpf']
+
+    if not cpf:
+        return jsonify({"error": True, "mensagem": "CPF do usuário não encontrado"}), 400
+
     tipo = dados['tipo']
-    valor = dados['valor']
+    valor = float(dados['valor'])
     descricao = dados['descricao']
-    categoria = dados['categoria']
+    categoria = dados['categoria'] if tipo == 'Despesa' else None
     data = dados['data']
+
+    if tipo == 'Despesa' and not categoria:
+        return jsonify({"error": True, "mensagem": "Categoria é obrigatória para despesas"}), 400
 
     query = QueryFactory.insert_query(
         table='receita_despesa',
-        columns=['tipo', 'valor', 'descricao', 'categoria', 'data'],
-        values=[tipo, valor, descricao, categoria, data]
+        columns=['tipo', 'valor', 'descricao', 'categoria', 'data', 'cliente'],
+        values=[tipo, valor, descricao, categoria, data, cpf]
     )
 
     inserir_db(query)
     
-    return jsonify(data)
+    return jsonify({"success": True, "mensagem": "Registro inserido com sucesso"})
 
 @app.route('/api/receitas', methods=['GET'])
 def receita_atual():
+    #dados = request.json
+    #print("📥 Recebido do frontend:", dados)
+
+    #cpf = request.cookies.get('cpf')  # Aqui você deve obter o CPF do usuário logado
+    #print(f"cpf recebido: {cpf}")
+
+    cpf = request.args.get('cpf')
+
+    if not cpf:
+        return jsonify({"error": True, "mensagem": "CPF do usuário não encontrado"}), 400
+
 
     mes_atual = datetime.now().month
     ano_atual = datetime.now().year
@@ -394,28 +466,44 @@ def receita_atual():
 
     query = QueryFactory.select_query(
         table='receita_despesa',
-        columns='SUM(valor)',
-        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND tipo = 'Receita'"
+        columns='COALESCE(SUM(valor), 0)',
+        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND tipo = 'Receita' AND cliente = '{cpf}'"
     )
 
     resultado = consultar_db(query)
-    return jsonify(resultado)
+    receita_total = resultado[0][0] if resultado else 0
+
+    return jsonify({"sum": receita_total})
 
 @app.route('/api/despesas', methods=['GET'])
 def despesa_atual():
 
+    #dados = request.json
+    #print("📥 Recebido do frontend:", dados)
+
+    #cpf = request.cookies.get('cpf')  # Aqui você deve obter o CPF do usuário logado
+    #print(f"cpf recebido: {cpf}")
+
+    cpf = request.args.get('cpf')
+
+    if not cpf:
+        return jsonify({"error": True, "mensagem": "CPF do usuário não encontrado"}), 400
+
+
     mes_atual = datetime.now().month
     ano_atual = datetime.now().year
 
 
     query = QueryFactory.select_query(
         table='receita_despesa',
-        columns='SUM(valor)',
-        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND tipo = 'Despesa'"
+        columns='COALESCE(SUM(valor), 0)',
+        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND tipo = 'Despesa' AND cliente = '{cpf}'"
     )
 
     resultado = consultar_db(query)
-    return jsonify(resultado)
+    despesa_total = resultado[0][0] if resultado else 0
+
+    return jsonify({"sum": despesa_total})
 
 
 @app.route('/api/saldoAtual', methods=['GET'])
@@ -449,37 +537,51 @@ def saldo_atual():
 
 @app.route('/api/resumoDoMesReceita', methods=['GET'])
 def resumo_do_mes_receita():
-    dados = request.json
-    login = dados['login']
-    ano = dados['ano']
-    mes = dados['mes']
+    #dados = request.json
+    cpf = request.args.get('cpf')
+    ano = request.args.get('ano')
+    mes = request.args.get('mes')
+
+    if not cpf:
+        return jsonify({"error": True, "mensagem": "CPF do usuário não encontrado"}), 400
+
+    if not ano or not mes:
+        return jsonify({"error": "Parâmetros ausentes"}), 400
 
     query = QueryFactory.select_query(
         table='receita_despesa',
-        columns='SUM(valor)',
-        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes}' AND cliente = '{login}' AND tipo = 'Receita'"
+        columns='COALESCE(SUM(valor), 0)',
+        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes}' AND cliente = '{cpf}' AND tipo = 'Receita'"
     )
 
     resultado = consultar_db(query)
+    receita_total = resultado[0][0] if resultado else 0
 
-    return jsonify(resultado)
+    return jsonify({"receitas": receita_total})
 
 @app.route('/api/resumoDoMesDespesa', methods=['GET'])
 def resumo_do_mes_despesa():
-    dados = request.json
-    login = dados['login']
-    ano = dados['ano']
-    mes = dados['mes']
+    #dados = request.json
+    cpf = request.args.get('cpf')
+    ano = request.args.get('ano')
+    mes = request.args.get('mes')
+
+    if not cpf:
+        return jsonify({"error": True, "mensagem": "CPF do usuário não encontrado"}), 400
+
+    if not ano or not mes:
+        return jsonify({"error": "Parâmetros ausentes"}), 400
 
     query = QueryFactory.select_query(
         table='receita_despesa',
-        columns='SUM(valor)',
-        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes}' AND cliente = '{login}' AND tipo = 'Despesa'"
+        columns='COALESCE(SUM(valor), 0)',
+        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes}' AND cliente = '{cpf}' AND tipo = 'Despesa' "
     )
 
     resultado = consultar_db(query)
+    despesa_total = resultado[0][0] if resultado else 0
 
-    return jsonify(resultado)
+    return jsonify({"despesas": despesa_total})
 
 IMAGE_DIR = 'static/imagens'
 if not os.path.exists(IMAGE_DIR):
@@ -487,12 +589,12 @@ if not os.path.exists(IMAGE_DIR):
 
 @app.route('/api/despesasPorCategoria', methods=['GET'])
 def despesas_por_categoria():
-    login = request.args.get('login')  # Pegando o login via query string
+    cpf = request.args.get('cpf')  # Pegando o login via query string
 
     categorias = ['Alimentação', 'Casa', 'Compras', 'Educação', 'Entretenimento', 'Outros', 'Roupa', 'Saúde', 'Transporte', 'Viagens'] 
 
-    if not login:
-        return jsonify({"erro": "Login não fornecido"}), 400
+    if not cpf:
+        return jsonify({"error": True, "mensagem": "CPF do usuário não encontrado"}), 400
 
     mes_atual = datetime.now().month
     ano_atual = datetime.now().year
@@ -502,7 +604,7 @@ def despesas_por_categoria():
     query_despesa = QueryFactory.select_query(
         table='receita_despesa',
         columns='COALESCE(SUM(valor), 0)',  # Se for NULL, retorna 0
-        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND tipo = 'Despesa'"
+        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND tipo = 'Despesa' AND cliente = '{cpf}'"
     )
     despesa_resultado = consultar_db(query_despesa)
     despesa_total = despesa_resultado[0][0] if despesa_resultado else 0
@@ -511,32 +613,55 @@ def despesas_por_categoria():
         query = QueryFactory.select_query(
             table='receita_despesa',
             columns='SUM(valor)',
-            where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND categoria = '{categoria}' AND cliente = '{login}' AND tipo = 'Despesa'"
+            where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND categoria = '{categoria}' AND cliente = '{cpf}' AND tipo = 'Despesa'"
         )
 
         resultado = consultar_db(query)
 
-        if resultado is None:  # Verifica se a consulta retornou algum valor
-            resultado = 0
+        valor = float(resultado[0][0]) if resultado and resultado[0] and resultado[0][0] is not None else 0  # Tratando possíveis valores nulos
 
-        resultado_porcentagem = resultado / despesa_total
+        resultado_porcentagem = (valor / float(despesa_total) * 100) if despesa_total > 0 else 0  # Evitar divisão por zero
 
         resultados_categorias[categoria] = resultado_porcentagem
 
     df = pd.DataFrame(list(resultados_categorias.items()), columns=['Categoria', 'Valor'])
 
-    df.set_index('Categoria').plot.pie(y ='Valor', autopct='%1.1f%%', startangle=90, legend=False)
+    df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce').fillna(0)
 
-    plt.title('Despesas por categoria')
+    if df['Valor'].sum() == 0:
+        return jsonify({"erro": "Nenhuma despesa encontrada"}), 400
+
+    cores = ['#D8C4B6', '#c77e4a', '#213555', '#eee37c', '#F5EFE7', '#aeaeaa', '#6f2b62', '#3E5879', '#286853', '#7f3751']
+
+    df_filtrado = df[df['Valor'] > 0]
+
+    fig, ax = plt.subplots()
+
+    wedges, texts, autotexts = ax.pie(
+        df_filtrado['Valor'],
+        labels=df_filtrado['Categoria'],  # Exibe os nomes das categorias
+        autopct='%1.1f%%',  # Exibe as porcentagens
+        startangle=140,
+        colors=cores[:len(df_filtrado)],
+        #wedgeprops={'edgecolor': 'white'}  # Borda branca nos setores
+    )
+
+    for text in texts + autotexts:
+        text.set_color('white')
+    ax.set_facecolor('#213555')
+
+    #plt.title('Despesas por categoria')
 
     image_path = os.path.join(IMAGE_DIR, 'despesas_por_categoria.png')
-    plt.savefig(image_path)
+    plt.savefig(image_path, transparent=True)
+    print(f"Imagem salva em: {image_path}")
 
     # Fechar o gráfico
     plt.close()
 
     # Retornar a URL da imagem gerada
     image_url = f'http://localhost:5000/images/despesas_por_categoria.png'
+    print(f"URL da imagem gerada: {image_url}")
 
     return jsonify({
         "resultados": resultados_categorias,
@@ -554,29 +679,74 @@ def despesas_por_categoria():
     #return jsonify(resultados_categorias)
 
 
+@app.route('/images/<path:filename>')
+def serve_image(filename):
+    return send_from_directory(IMAGE_DIR, filename)
+
+
+
     
 @app.route('/api/evolucaoDespesas', methods=['GET'])
 def evolucao_despesas():
 
-    meses = [(datetime.now() - relativedelta(months=i)).strftime('%Y-%m') for i in range(5)]
+    cpf = request.args.get('cpf')  # Pegando o login via query string
 
-    despesas_meses = {}
+    if not cpf:
+        return jsonify({"error": True, "mensagem": "CPF do usuário não encontrado"}), 400
+
+    meses = [(datetime.now() - relativedelta(months=i)).strftime('%Y-%m') for i in range(4, -1, -1)]
+    nomes_meses = [(datetime.strptime(m, '%Y-%m')).strftime('%B').capitalize() for m in meses]
+
+    despesas_meses = []
 
     for mes in meses:
-        ano, mes_numero = mes.split('-')#q isso? Pra que mes numero que não é usado?
+        ano, mes_numero = mes.split('-')
 
         query = QueryFactory.select_query(
             table='receita_despesa',
             columns='SUM(valor)',
-            where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes_numero}' AND cliente = '{login}' AND tipo = 'Despesa'"#login não existe aqui tem que receber ele
+            where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes_numero}' AND cliente = '{cpf}' AND tipo = 'Despesa'"#login não existe aqui tem que receber ele
         )
 
         resultado = consultar_db(query)
 
-        despesas_meses[mes] = resultado
+        print("nomes_meses:", nomes_meses, "Tamanho:", len(nomes_meses))
+        print("despesas_meses:", despesas_meses, "Tamanho:", len(despesas_meses))
 
-    return despesas_meses
 
+        despesas_meses.append(resultado[0][0] if resultado and resultado[0][0] is not None else 0)
+
+    while len(despesas_meses) < len(nomes_meses):
+        despesas_meses.append(0)
+
+    df = pd.DataFrame({'Mês': nomes_meses, 'Despesas': despesas_meses})
+
+    fig, ax = plt.subplots(figsize=(8, 4))
+    bars = ax.bar(df['Mês'], df['Despesas'], color='#3E5879')
+
+    ax.set_title("Evolução das despesas", fontsize=14, color='#F5EFE7')
+    ax.set_facecolor('#213555')
+    ax.spines['bottom'].set_color('#F5EFE7')
+    ax.spines['left'].set_color('#F5EFE7')
+    ax.xaxis.label.set_color('#F5EFE7')
+    ax.yaxis.label.set_color('#F5EFE7')
+    ax.tick_params(axis='x', colors='#F5EFE7', labelsize=10)
+    ax.tick_params(axis='y', colors='#F5EFE7', labelsize=10)
+
+    for bar, valor in zip(bars, df['Despesas']):
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), str(valor),
+                ha='center', va='bottom', fontsize=10, color='white')
+
+    image_path = os.path.join(IMAGE_DIR, 'evolucao_despesas.png')
+    plt.savefig(image_path, transparent=True)
+    plt.close()
+
+    image_url = f'http://localhost:5000/images/evolucao_despesas.png'
+    
+    return jsonify({
+        "resultado": resultado,
+        "grafico_url": image_url
+    })
 
 
 @app.route('/api/resumoFinanceiro', methods=['GET'])

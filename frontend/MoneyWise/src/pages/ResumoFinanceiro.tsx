@@ -59,7 +59,7 @@ export const ResumoFinanceiro = () => {
             <div className="sidebar">
             <button onClick={() => navigate('/EditarPerfil')} className="button"><img src={perfil} className='adicionar'/></button>
             <button onClick={() => navigate('/Home')} className="button"><img src={home} className='adicionar'/></button>
-            <button onClick={() => navigate('/AdicionarReceitaDespesa')} className="button"><img src={adicionar} className='adicionar'/></button>
+            <button onClick={() => navigate('/adicionarReceitaOuDespesa')} className="button"><img src={adicionar} className='adicionar'/></button>
             <button onClick={() => navigate('/ResumoFinanceiro')} className="button"><img src={resume} className='adicionar'/></button>
             <button onClick={() => navigate('/OrcamentoMensalERelatorio')} className="button"><img src={relatorio} className='adicionar'/></button>
 
@@ -94,7 +94,7 @@ export const ResumoFinanceiro = () => {
                                     <option key={ano} value={ano}>{ano}</option>
                                 ))}
                             </select>
-                            </div>
+                        </div>
                     </div>
 
                     <table className="tabela-resumo">

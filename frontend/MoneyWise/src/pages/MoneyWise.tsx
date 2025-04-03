@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom"
 import '../App.css'
 import '../style/MoneyWise.css'
-import logo from "../imagens/logo.png"
+import icone from "../imagens/icon1.png"
+import moneywise from "../imagens/moneywise.png"
 import ilustracao from "../imagens/ilustracao.png"
 
 
@@ -13,7 +14,8 @@ export const MoneyWise = () => {
     
 
         <><header className="header-cabecalho">
-            <img src={logo} className="logo-cabecalho"/>
+            <img src={icone} className="logo-cabecalho"/>
+            <img src={moneywise} className="escrita-cabecalho"/>
             <div className="button-cabecalho">
                 <button onClick={() => navigate('/login')} className="login-button">
                     Entrar

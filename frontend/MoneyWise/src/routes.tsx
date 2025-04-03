@@ -20,7 +20,7 @@ export const AppRoutes = () => {
                 <Route path='/cadastro' element={<Cadastro/>}/>
                 <Route path='/EditarPerfil' element={<EditarPerfil/>}/>
                 <Route path='/home' element={<Home/>}/>
-                <Route path='/adicionarReceitaDespesa' element={<AdicionarReceitaDespesa/>}/>
+                <Route path='/adicionarReceitaOuDespesa' element={<AdicionarReceitaDespesa/>}/>
                 <Route path='/resumoFinanceiro' element={<ResumoFinanceiro/>}/>
                 <Route path='/OrcamentoMensalERelatorio' element={<OrcamentoMensalERelatorio/>}/>
 
