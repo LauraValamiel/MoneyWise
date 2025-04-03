@@ -1,0 +1,391 @@
+.App {
+    text-align: center;
+  }
+
+
+  .App-logo {
+    height: 40vmin;
+    pointer-events: none;
+  }
+  
+  @media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+      animation: App-logo-spin infinite 20s linear;
+    }
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inria+Serif:wght@300;400;700&display=swap');
+
+  * {
+    font-family: 'Inria Serif', serif;
+}
+
+
+  
+  /*@font-face {
+    font-family: Monserrat;
+    src: url(./fonts/montserrat/Montserrat-Light.otf)
+  }*/
+  
+  .form select, .form input{ /*dadosLogin*/
+    font-size: calc(4px + 2vmin);
+    font-style: italic;
+    background: #F5EFE7;
+    padding: 5px;
+    border-radius: 10px;
+    color: #000000;
+    border-color: #F5EFE7;
+    margin: 10px;
+    text-align: left;
+    font-family: Monserrat;
+    width: calc(400px + 2vmin);
+    height: calc(20px + 2vmin);
+  }
+  
+  label {
+    padding: 10px;
+    font-family: Monserrat;
+  }
+  
+  button{
+    /*font-size: calc(4px + 2vmin);
+    font-family: Monserrat ;
+    background: #3E5879;
+    padding: 10px;
+    border-radius: 10px;
+    border-color: #3E5879;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    display: flex;
+    width: calc(400px + 2vmin);
+    justify-content: center;*/
+    
+    /*text-decoration: none;*/
+    border: 1px solid #000;
+    border-radius: 5px;
+    padding: 5px;
+    color: #fff;
+
+  }
+
+
+  .button-logincadastro{
+    font-size: calc(4px + 2vmin);
+    font-family: Monserrat ;
+    background: #3E5879;
+    padding: 10px;
+    border-radius: 10px;
+    border-color: #3E5879;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    display: flex;
+    width: calc(400px + 2vmin);
+    justify-content: center;
+
+  }
+
+
+ .button:hover{
+    font-weight: bold;
+}
+
+  
+  
+  .form {
+    padding: 20px;
+    text-align: left;
+    background-color: #213555;
+    min-height: auto;
+    min-width: 50vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(4px + 2vmin);
+    color: rgb(255, 255, 255);
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .logo {
+    text-align: center;
+    height: 40vh;
+    width: 40vh;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  * {
+    margin: 0;                  
+    padding: 0;                
+    box-sizing: border-box;     
+}
+  
+  
+  .App-header {
+    text-align: center;
+    color: white;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: #3E5879;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    padding: 20px;
+    /*background-image: url("./img/fundo.png");*/
+  }
+  
+  .caixa {
+    text-align: center;
+    color: white;
+    background-size: "100%";
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: rgb(235, 235, 235);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+  }
+  
+  .App-link {
+    color: #61dafb;
+  }
+  
+  @keyframes App-logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .header-caixa {
+    height: 50px;
+    background-color: #ffffff;
+    width: 100%;
+    margin-top: 0;
+    display: flex;
+    font-family: Monserrat;
+    text-align: center;
+    justify-content: flex-start;
+    font-size: calc(0.5px + 2vmin);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: #ffffff98;
+    border-width: 5px;
+  }
+  
+  .logoHeader {
+    height: 15vh;
+    width: 15vh;
+  }
+
+  .telainicial {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    background-color: #3E5879;
+    align-items: flex-start; /* Mantém o alinhamento à esquerda */
+    justify-content: flex-start; /* Ajusta a posição para o topo */
+    padding-left: 10%; /* Ajusta a margem esquerda */
+    padding-top: 15vh; /* Ajuste esse valor para subir/descer o conteúdo */
+  }
+    
+  title {
+    font-size: 10px;
+    }
+    
+  .header-cabecalho {
+    background-color: #213555; /* Azul */
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between; /* Logo à esquerda e outros elementos à direita */
+    align-items: center; 
+  }
+
+  .button-cabecalho{
+    display: flex;
+    gap: 20px; 
+    background-color: #213555;
+  }
+
+  .logo-cabecalho {
+    height: 70px; /* Defina o tamanho adequado para a logo */
+    width: auto;
+  }
+
+  .title {
+    font-size: 6em; /* Tamanho do texto */
+    font-weight: bold;
+    text-align: center;
+    color: #93ACFE;
+    margin-top: 150px; /* Suba ou desça o texto */
+  }
+  
+  .login-button {
+    font-size: 1.5em;
+    padding: 8px 30px;
+    margin-top: 20px;
+    border-radius: 15px;
+    border: none;
+    background-color: #F5EFE7;
+    color: #213555;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    outline: none; /* Remove o contorno ao clicar */
+    justify-content: center;
+  }
+  
+  /* Efeito ao passar o mouse */
+  .login-button:hover {
+    background-color: #F5EFE7;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #F5EFE7;
+  }
+  
+  /* Efeito ao clicar */
+  .login-button:active {
+    transform: scale(0.95);
+  }
+  
+  /* Remove o contorno quando o botão recebe foco */
+  .login-button:focus {
+    outline: none;
+  }
+
+  .telainicio{
+    display: flex;
+    background-color: #3E5879;
+    height: 100vh; /* Ocupa a altura total da tela */
+    width: 100vw; 
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .cards {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+
+  .resumo-card h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .resumo-card p {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .sidebar {
+    width: 90px;
+    height: 100vh;
+    background-color: #213555;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    gap: 0px;
+    padding: 0;
+    margin: 0;
+    justify-content: flex-start;
+  }
+  
+  .sidebar button {
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 5px;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+  }
+
+  .adicionar {
+    height: 50px; /* Defina o tamanho adequado para a logo */
+    width: auto;
+
+  }
+
+  .logo-final {
+    margin-top: auto; /* Empurra a imagem para o final */
+    width: 55px;  /* Ajuste conforme necessário */
+    height: auto;
+  }
+
+  .moneywise {
+    /*margin-top: auto; /* Empurra a imagem para o final */
+    width: 70px;  /* Ajuste conforme necessário */
+    height: auto;
+  }
+
+  /*.seletores {
+    width: 250%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+  }
+
+  .custom-select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #3E5879;
+    border-radius: 5px;
+    background-color: #F5EFE7;
+    color: #333;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.seletores select:hover {
+    border-color: #F5EFE7;;
+}
+
+.seletores select:focus {
+    border-color: #F5EFE7;
+    box-shadow: 0 0 5px #F5EFE7;
+}*/
+
+.icon {
+  width: 25px; 
+  height: 25px;
+  margin-right: 8px; /* Espaço entre o ícone e o texto */
+}
+
+
+

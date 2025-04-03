@@ -1,0 +1,104 @@
+
+* {
+  font-family: 'Inria Serif', serif;
+}
+.resumo-mes {
+    background-color: #213555;
+    padding: 50px;
+    border-radius: 10px;
+    color: #F5EFE7;
+    width: 100%;
+  }
+  
+  .header-resumo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .titulo-resumo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    color: #F5EFE7;
+    font-size: 24px;
+    gap: 10px;
+  }
+
+  .seletores select {
+    display: inline-block;
+    flex-direction: row;
+    gap: 10px; 
+    margin-right: auto;
+    background-color: #D8C4B6;
+    color: #213555;
+    font-size: 18px;
+    border: 2px solid #213555;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    appearance: none;
+
+  }
+
+  .seletores select:hover {
+    background-color: #e0d6cc;
+    
+}
+
+/* Altera a cor quando o usuário clica */
+.seletores select:focus {
+    outline: none;
+    border-color: #f76c6c;
+    box-shadow: 0px 0px 5px rgba(247, 108, 108, 0.5);
+}
+  
+  .titulo-resumo .icon {
+    font-size: 24px;
+    margin-right: 8px;
+  }
+  
+  .month-selector {
+    background-color: #d9b9a3;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .conteudo-sumario {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .item-sumario {
+    display: flex;
+    align-items: right;
+    justify-content: space-between;
+    background-color: #213555;
+    padding: 10px;
+    border-radius: 8px;
+    color: #F5EFE7;
+    font-size: 24px;
+  }
+  
+  .item-sumario .icon {
+    font-size: 20px;
+    margin-right: 10px;
+  }
+  
+  .amount {
+    font-weight: bold;
+    color: #F5EFE7;
+    font-size: 20px;
+  }
+
+  .select-mes{
+    justify-content: space-between;
+
+  }
+  

@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import datetime
@@ -66,6 +67,7 @@ class QueryFactory:
 
 # Outras funções para manipular o banco de dados
 def consultar_db(query):
+    con = None
     try:
         con = DatabaseConnection().get_connection()
         cur = con.cursor()
@@ -97,9 +99,11 @@ def inserir_db(query):
 # Inicializando o Flask
 app = Flask(__name__)
 CORS(app)
+#CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 
 #Categorias:
-dict_categorias: {'Alimentação', 'Casa', 'Compras', 'Educação', 'Entretenimento', 'Outros', 'Roupa', 'Saúde', 'Transporte', 'Viagens'}
+#dict_categorias: {'Alimentação', 'Casa', 'Compras', 'Educação', 'Entretenimento', 'Outros', 'Roupa', 'Saúde', 'Transporte', 'Viagens'}
 
 
 def receita(login):
@@ -231,16 +235,24 @@ def relatorio_por_categoria(categoria, login):
 
 
 def busca_cliente(cpf):
+    print(f"cpf recebido: {cpf}")
     query = QueryFactory.select_query(
         table='cliente',
         columns='cpf',
-        where_clause=f"cpf = {cpf}"
+        where_clause=f"cpf = '{cpf}'"
     )
+    print(f"Consulta sql: {query}")
     resposta = consultar_db(query)
 
-    df_bd = pd.DataFrame(resposta, columns=['cpf']).to_dict()
+    print(f"resposta do banco: {resposta}")
+
+    #df_bd = pd.DataFrame(resposta, columns=['cpf']).to_dict()
     
-    return df_bd
+    #return df_bd
+
+    if resposta:
+        return resposta[0][0]
+    return None
 
 
 def evolucao_despesas(login):
@@ -275,7 +287,7 @@ def send_login():
     query = QueryFactory.select_query(
         table='cliente',
         columns='nome, cpf',
-        where_clause=f"email = '{login}' AND senha = {senha}"
+        where_clause=f"email = '{login}' AND senha = '{senha}'"
     )
 
     resp = consultar_db(query)
@@ -288,6 +300,12 @@ def send_login():
 @app.route('/api/cadastro', methods=['POST'])
 def create_cliente():
     dados = request.json
+
+    print(f"dados: {dados}")
+
+    if not dados:
+        return {'error': True, 'mensagem': 'Requisição malformada'}, 400
+    
     nome = dados['nome']
     email = dados['email']
     cpf = dados['cpf'] 
@@ -297,28 +315,42 @@ def create_cliente():
 
     cliente = busca_cliente(cpf)
 
-    if len(cliente) > 0:
-        return jsonify({'error': True, 'mensagem': 'O cliente já existe'})
+    if cliente is None:
+        cliente = []
+
+    print(f"cliente: '{cliente}'")
+
+    print(f"lencliente: {len(cliente)}")
+
+    #if len(cliente) > 1:
+    #    return jsonify({'error': True, 'mensagem': 'O cliente já existe'})
+    if cliente:
+        return {'error': True, 'mensagem': 'O cliente já existe'}, 400
+    elif not nome or not email or not cpf or not telefone or not senha:
+        return {'error': True, 'mensagem': 'Dados incompletos para o cadastro'}
     else:
         query = QueryFactory.insert_query(
         table='cliente',
-        columns=['nome', 'email', 'cpf', 'celular', 'senha'],
+        columns=['nome', 'email', 'CPF', 'telefone', 'senha'],
         values=[nome, email, cpf, telefone, senha]
     )
         inserir_db(query)
 
-        return jsonify(dados)
+        return jsonify({'success': True, 'mensagem': 'Cliente cadastrado com sucesso', 'cliente': dados}), 201
+
 
 @app.route('/api/editarCliente', methods=['POST'])
 def edit_cliente(): #olhar de colocar o nome
     dados = request.json
-    nome = dados['login']
+    nome = dados['nome']
     email = dados['email']
     cpf = dados['cpf']
     telefone = dados['telefone']
 
     updates = {}
 
+    if(nome):
+        updates['nome'] = nome
     if(email):
         updates['email'] = email
     if(telefone):
@@ -327,7 +359,7 @@ def edit_cliente(): #olhar de colocar o nome
     update_query = QueryFactory.update_query(
         table='cliente',
         updates=updates,
-        where_clause=f"cpf = {cpf} AND nome = {nome}"
+        where_clause=f"cpf = '{cpf}' AND nome = '{nome}'"
     )
 
     inserir_db(update_query)
@@ -388,9 +420,32 @@ def despesa_atual():
 
 @app.route('/api/saldoAtual', methods=['GET'])
 def saldo_atual():
-    saldo_atual = receita_atual() - despesa_atual()
 
-    return jsonify(saldo_atual)
+    mes_atual = datetime.now().month
+    ano_atual = datetime.now().year
+
+    # Consulta o total de receitas
+    query_receita = QueryFactory.select_query(
+        table='receita_despesa',
+        columns='COALESCE(SUM(valor), 0)',  # Se for NULL, retorna 0
+        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND tipo = 'Receita'"
+    )
+    receita_resultado = consultar_db(query_receita)
+    receita_total = receita_resultado[0][0] if receita_resultado else 0  # Pega o valor da tupla
+
+    
+    # Consulta o total de despesas
+    query_despesa = QueryFactory.select_query(
+        table='receita_despesa',
+        columns='COALESCE(SUM(valor), 0)',  # Se for NULL, retorna 0
+        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND tipo = 'Despesa'"
+    )
+    despesa_resultado = consultar_db(query_despesa)
+    despesa_total = despesa_resultado[0][0] if despesa_resultado else 0  # Pega o valor da tupla
+
+    saldo_atual = receita_total - despesa_total  # Calcula o saldo
+
+    return jsonify({"saldo": saldo_atual})
 
 @app.route('/api/resumoDoMesReceita', methods=['GET'])
 def resumo_do_mes_receita():
@@ -426,17 +481,33 @@ def resumo_do_mes_despesa():
 
     return jsonify(resultado)
 
+IMAGE_DIR = 'static/imagens'
+if not os.path.exists(IMAGE_DIR):
+    os.makedirs(IMAGE_DIR)
+
 @app.route('/api/despesasPorCategoria', methods=['GET'])
 def despesas_por_categoria():
-    dados = request.json
-    login = dados['login']
+    login = request.args.get('login')  # Pegando o login via query string
+
+    categorias = ['Alimentação', 'Casa', 'Compras', 'Educação', 'Entretenimento', 'Outros', 'Roupa', 'Saúde', 'Transporte', 'Viagens'] 
+
+    if not login:
+        return jsonify({"erro": "Login não fornecido"}), 400
 
     mes_atual = datetime.now().month
     ano_atual = datetime.now().year
 
     resultados_categorias = {}
 
-    for categoria in dict_categorias:
+    query_despesa = QueryFactory.select_query(
+        table='receita_despesa',
+        columns='COALESCE(SUM(valor), 0)',  # Se for NULL, retorna 0
+        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND tipo = 'Despesa'"
+    )
+    despesa_resultado = consultar_db(query_despesa)
+    despesa_total = despesa_resultado[0][0] if despesa_resultado else 0
+
+    for categoria in categorias:
         query = QueryFactory.select_query(
             table='receita_despesa',
             columns='SUM(valor)',
@@ -445,22 +516,44 @@ def despesas_por_categoria():
 
         resultado = consultar_db(query)
 
-        resultado_porcentagem = resultado / despesa_atual()
+        if resultado is None:  # Verifica se a consulta retornou algum valor
+            resultado = 0
+
+        resultado_porcentagem = resultado / despesa_total
 
         resultados_categorias[categoria] = resultado_porcentagem
 
-        df = pd.DataFrame(list(resultados_categorias.items()), columns=['Categoria', 'Valor'])
+    df = pd.DataFrame(list(resultados_categorias.items()), columns=['Categoria', 'Valor'])
 
-        df.set_index('Categoria').plot.pie(y ='Valor', autopct='%1.1f%%', startangle=90, legend=False)
+    df.set_index('Categoria').plot.pie(y ='Valor', autopct='%1.1f%%', startangle=90, legend=False)
 
-        plt.title('Despesas por categoria')
+    plt.title('Despesas por categoria')
 
+    image_path = os.path.join(IMAGE_DIR, 'despesas_por_categoria.png')
+    plt.savefig(image_path)
+
+    # Fechar o gráfico
+    plt.close()
+
+    # Retornar a URL da imagem gerada
+    image_url = f'http://localhost:5000/images/despesas_por_categoria.png'
+
+    return jsonify({
+        "resultados": resultados_categorias,
+        "grafico_url": image_url
+    })
+        
         #exibir o grafico:
         #plt.ylabel('')
         #plt.show()
 
+        #valor = float(resultado[0]) if resultado and resultado[0] is not None else 0  # Tratando possíveis valores nulos
 
-        return jsonify(resultado)
+        #resultados_categorias.append({"categoria": categoria, "valor": valor})
+
+    #return jsonify(resultados_categorias)
+
+
     
 @app.route('/api/evolucaoDespesas', methods=['GET'])
 def evolucao_despesas():
@@ -528,9 +621,12 @@ def relatorio_categorias():
     mes_atual = datetime.now().month
     ano_atual = datetime.now().year
 
+    categorias = ['Alimentação', 'Casa', 'Compras', 'Educação', 'Entretenimento', 'Outros', 'Roupa', 'Saúde', 'Transporte', 'Viagens'] 
+
+
     resultados_categorias = {}
 
-    for categoria in dict_categorias:
+    for categoria in categorias:
         query = QueryFactory.select_query(
             table='receita_despesa',
             columns='SUM(valor)',

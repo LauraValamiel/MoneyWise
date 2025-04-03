@@ -1,0 +1,204 @@
+* {
+    font-family: 'Inria Serif', serif;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #2C3E50;
+}
+
+
+.form-adicionar label {
+    display: flex;
+    align-items: center;
+    font-size: 25px;
+    font-weight: bold;
+    text-align: right;
+    margin-right: 20px;
+    color: #e0e0e0;
+    white-space: nowrap;
+    justify-content: center;
+    width: 500px;/* Mantém uma largura fixa para os labels */
+    gap: 25px;
+    min-width: 120px;
+
+    
+}
+  
+  .form-adicionar{
+    padding: 50px;
+    text-align: left;
+    background-color: #213555;
+    min-height: auto;
+    min-width: 50vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    font-size: calc(4px + 2vmin);
+    color: rgb(255, 255, 255);
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    width: 850px;
+    gap: 10px;
+    
+  }
+  
+  .input-field, .select-field {
+    flex: 1; /* Faz com que o input ou select ocupem o espaço restante */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #F5EFE7;
+    color: #213555;
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+  }
+  
+  .form-adicionar select, .form-adicionar input{ /*dadosLogin*/
+    font-size: 16px;
+    font-style: italic;
+    background: #F5EFE7;
+    padding: 10px;
+    border-radius: 10px;
+    color: #000000;
+    border-color: #F5EFE7;
+    margin: 3px;
+    text-align: left;
+    font-family: Monserrat;
+    /*width: calc(400px + 2vmin);
+    height: calc(20px + 2vmin);*/
+    width: 100%;
+    /*width: 400px;
+    height: 40px;*/
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 500px;
+    flex-grow: 1;
+  }
+
+
+  .form-adicionar label i {
+    min-width: 20px; /* Mantém o ícone alinhado */
+    text-align: center;
+}
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    gap: 10px;
+  }
+
+  
+  
+  .titulo-adicionar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    color: #F5EFE7;
+    font-size: 24px;
+    gap: 10px;
+    text-align: right;
+    padding-left: 10px;
+  }
+
+  .seletores-adicionar {
+    width: 250%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+  }
+
+  .custom-select-adicionar {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #3E5879;
+    border-radius: 5px;
+    background-color: #F5EFE7;
+    color: #213555;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.seletores-adicionar select:hover {
+    border-color: #F5EFE7;;
+}
+
+.seletores-adicionar select:focus {
+    border-color: #F5EFE7;
+    box-shadow: 0 0 5px #F5EFE7;
+}
+
+.button-adicionar{
+
+    font-size: calc(4px + 2vmin);
+    font-family: Monserrat ;
+    background: #F5EFE7;
+    padding: 10px;
+    border-radius: 10px;
+    border-color: #3E5879;
+    text-align: center;
+    color: #213555;
+    font-weight: bold;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    display: flex;
+    /*width: calc(400px + 2vmin);*/
+    width: 250px;
+    justify-content: center;
+    align-self: flex-end;
+
+  }
+
+  .button-adicionar:hover {
+    background-color: #F5EFE7;
+    transform: scale(1.1);
+    /*box-shadow: 0 0 15px #F5EFE7;*/
+  }
+  
+  /* Efeito ao clicar */
+  .button-adicionar:active {
+    transform: scale(0.95);
+  }
+  
+  /* Remove o contorno quando o botão recebe foco */
+  .button-adicionar:focus {
+    outline: none;
+  }
+
+  .label-adicionar {
+    font-size: 20px;
+    font-weight: bold;
+    color: #F5EFE7;
+    margin-bottom: 10px;
+    text-align: right;
+    align-items: center;
+    justify-content: space-between;
+    align-self: flex;
+    
+  }
+
+  .icon-adicionar {
+    width: 35px; 
+    height: 35px;
+    margin-right: 0px;
+    object-fit: contain;
+    margin-bottom: 6px; /* 🔹 Ajuste fino se necessário */
+}

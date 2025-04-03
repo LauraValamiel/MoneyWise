@@ -1,10 +1,13 @@
+import { AppRoutes } from "./routes";
+import StoreProvider from './components/store/Provider.jsx';
 
 
 export function App() {
 
-  return (
-    <>
-      Teste
-    </>
-  )
+  return(
+    <StoreProvider>
+      <AppRoutes />
+    </StoreProvider>
+
+  ) 
 }

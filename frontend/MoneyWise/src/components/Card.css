@@ -1,0 +1,22 @@
+* {
+  font-family: 'Inria Serif', serif;
+}
+
+.card {
+    background-color: #213555;
+    padding: 50px;
+    border-radius: 10px;
+    text-align: center;
+    color: #F5EFE7;
+    width: 32%;
+  }
+  
+  .card h3 {
+    margin: 0;
+  }
+  
+  .card p {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  

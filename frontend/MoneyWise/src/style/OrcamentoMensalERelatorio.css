@@ -1,0 +1,262 @@
+* {
+    font-family: 'Inria Serif', serif;
+}
+
+
+.pagina {
+    display: flex;
+    justify-content: center; /* 🔹 Centraliza horizontalmente */
+    align-items: center; /* 🔹 Centraliza verticalmente */
+    min-height: 100vh;
+    width: 100%;
+    flex-direction: column;
+}
+
+.orcamento-container {
+    background-color: #213555;
+    padding: 50px;
+    border-radius: 10px;
+    min-height: 100vh;
+    min-width: 50vh;
+    margin: 0 auto;
+    width: calc(100% - 90px);
+    max-width: 1300px;
+    align-items: center;
+    color: #F5EFE7;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    gap: 20px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.orcamento-mensal {
+    background-color: #213555;
+    padding: 20px;
+    border-radius: 10px;
+    min-height: auto;
+    min-width: 50vh;
+    width: 1340px;
+    max-width: 90%;
+    margin: 20px auto;
+    text-align: center;
+    color: #F5EFE7;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    gap: 15px;
+    height: 310px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 0; 
+    
+}
+
+.relatorio {
+    background-color: #213555;
+    padding: 20px;
+    border-radius: 10px;
+    min-height: auto;
+    min-width: 50vh;
+    max-width: 90%;
+    width: 1200px;
+    margin: 20px auto;
+    text-align: center;
+    color: #F5EFE7;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    gap: 15px;
+    height: 530px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 0; 
+}
+
+.relatorio-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 900px;
+    gap: 50px;
+}
+
+/* Cada coluna */
+.relatorio-coluna {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.orcamento-mensal select {
+    margin-left: 10px;
+    padding: 5px;
+    font-size: 16px;
+    background-color: #F5EFE7;
+    color: #213555;
+    border-radius: 5px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    align-items: center;
+    font-size: 22px;
+}
+
+@media (max-width: 768px) {
+    .orcamento-container {
+        width: 100%; /* Usa toda a largura sem sidebar */
+        padding: 15px; /* Permite que a altura se ajuste automaticamente */
+    }
+
+    .orcamento-mensal, .relatorio {
+        width: 95%;
+        padding: 20px;
+    }
+}
+
+.relatorio li {
+    display: grid;
+    grid-template-columns: auto 1fr auto; /* Ícone - Nome - Porcentagem */
+    align-items: center;
+    gap: 10px; /* Espaço entre os elementos */
+    padding: 5px 0;
+}
+
+
+.relatorio li img {
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+    margin-left: 100px;
+}
+
+.relatorio ul {
+    list-style: none; /* Remove marcadores padrão */
+    padding: 0;
+}
+
+.relatorio li span {
+    flex-grow: 1; /* Permite que o nome da categoria ocupe o espaço corretamente */
+    text-align: left; /* Alinha os textos à esquerda */
+    margin-right: 25px;
+}
+
+
+
+.orcamento-titulo {
+    margin-top: -10px; /* 🔹 Move o título para cima */
+    padding-top: 0; 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    color: #F5EFE7;
+    font-size: 28px;
+    gap: 10px;
+    text-align: right;
+    margin-bottom: 12px;
+    margin-left: 12px;
+}
+
+.icon-orcamento {
+    width: 35px; 
+    height: 35px;
+    margin-right: 8px;
+    object-fit: contain;
+    margin-bottom: -6px; /* 🔹 Ajuste fino se necessário */
+}
+
+
+
+.orcamento-inputs {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 0px;
+    margin: 10px 0;
+    margin-bottom: 18px;
+}
+
+.orcamento-inputs select {
+    padding: 6px 10px;
+    font-size: 18px;
+    border: 2px solid #213555;
+    border-radius: 5px;
+    background-color: #F5EFE7;
+    color: #213555;
+    cursor: pointer;
+    appearance: none;
+    margin-left: 5px;
+
+}
+
+.orcamento-mensal select:hover {
+    background-color: #D8C4B6;
+    
+}
+
+/* Altera a cor quando o usuário clica */
+.orcamento-mensal select:focus {
+    outline: none;
+    border-color: #213555;
+    box-shadow: 0px 0px 5px #213555;
+}
+
+.mes-titulo {
+    /*color: #F5EFE7;
+    font-size: 24px;
+    margin-bottom: 20px;*/
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    color: #F5EFE7;
+    font-size: 24px;
+    gap: 10px;
+    text-align: right;
+    margin-bottom: 12px;
+    margin-right: -860px;
+    margin-left: 12px;
+}
+
+.mes-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 15px;
+    
+}
+
+
+.titulo-valor {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    color: #F5EFE7;
+    font-size: 24px;
+    gap: 10px;
+    text-align: right;
+    padding: 10px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+}
+
+
