@@ -13,6 +13,7 @@
     align-items: center;
     justify-content: center;
     font-size: calc(4px + 2vmin);
+    font-family: 'Iniria Serif', serif;
     color: rgb(255, 255, 255);
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -22,6 +23,7 @@
 
   .form-editar select, .form-editar input{ /*dadosLogin*/
     font-size: calc(4px + 2vmin);
+    font-family: 'Iniria Serif', serif;
     font-style: italic;
     background: #F5EFE7;
     padding: 5px;
@@ -44,7 +46,7 @@
 
   .nome-perfil{
     font-size: 28px;
-    font-family: Monserrat;
+    font-family: 'Iniria Serif', serif;
     color: #F5EFE7;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -52,7 +54,7 @@
 
   .button-editar{
     font-size: calc(4px + 2vmin);
-    font-family: Monserrat ;
+    font-family: 'Iniria Serif', serif;
     background: #F5EFE7;
     padding: 10px;
     border-radius: 10px;
@@ -72,7 +74,7 @@
 
   .button-logout{
     font-size: calc(4px + 2vmin);
-    font-family: Monserrat ;
+    font-family: 'Iniria Serif', serif;
     background: #F5EFE7;
     padding: 10px 20px;
     border-radius: 10px;

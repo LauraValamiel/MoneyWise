@@ -9,6 +9,7 @@
     width: 100%;
     border-bottom: 1px solid gray;
     font-size: 18px;
+    font-family: 'Iniria Serif', serif;
     text-align: center;
     padding: 5px;
   }
@@ -31,6 +32,7 @@
     right: -10px;
     top: -10px;
     font-size: 24px;
+    font-family: 'Iniria Serif', serif;
     background: #ffffff;
     border-radius: 18px;
     border: 1px solid #cfcece;

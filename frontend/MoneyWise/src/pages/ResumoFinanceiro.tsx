@@ -105,25 +105,25 @@ export const ResumoFinanceiro = () => {
                     <div className="selecao-container">
                         <div className="mes-titulo"><label><img src={data} className='icon'/>Mês/Ano:</label></div>
                         <div className="selecao-inputs">
-                        <select 
-                            id="mes" 
-                            value={mes} 
-                            onChange={(e) => setMes(Number(e.target.value))}>
-                            {Object.entries(meses).map(([nomeMes, numeroMes]) => (
-                                <option key={numeroMes} value={numeroMes}>{nomeMes}</option>
-                            ))}
-                        </select>
-                            
-                            <label htmlFor="ano"></label>
                             <select 
-                                id="ano" 
-                                value={ano} 
-                                onChange={(e) => setAno(Number(e.target.value))}>
-
-                                {gerarAnos().map((ano) => (
-                                    <option key={ano} value={ano}>{ano}</option>
+                                id="mes" 
+                                value={mes} 
+                                onChange={(e) => setMes(Number(e.target.value))}>
+                                {Object.entries(meses).map(([nomeMes, numeroMes]) => (
+                                    <option key={numeroMes} value={numeroMes}>{nomeMes}</option>
                                 ))}
                             </select>
+                                
+                                <label htmlFor="ano"></label>
+                                <select 
+                                    id="ano" 
+                                    value={ano} 
+                                    onChange={(e) => setAno(Number(e.target.value))}>
+
+                                    {gerarAnos().map((ano) => (
+                                        <option key={ano} value={ano}>{ano}</option>
+                                    ))}
+                                </select>
                         </div>
                     </div>
 

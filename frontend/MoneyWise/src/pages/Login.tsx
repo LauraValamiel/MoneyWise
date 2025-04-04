@@ -80,6 +80,7 @@ export const Login = () => {
                     Senha:<br/>
                     <input
                     name="senha"
+                    type="password"
                     className='dadosLogin'
                     value={formData.senha}
                     onChange={handleInputChange}/>
