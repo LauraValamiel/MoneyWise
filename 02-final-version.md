@@ -20,19 +20,19 @@ A aplicação, permite uma melhor organização financeira, ajudando os usuário
 - Visualizar orçamento mensal e relatório.
   
 ### 2. Outras funcionalidades implementadas
--Editar dados do usuário (nome, email e número do celular).
+- Editar dados do usuário (nome, email e número do celular).
 
 ### 3. Arquitetura do Projeto
 ### 3.1 Backend
--Framework: Flask.
--Banco de dados: PostgreSQL.
--APIs REST para as rotas ficarem mais organizadas e padronizadas.
+- Framework: Flask.
+- Banco de dados: PostgreSQL.
+- APIs REST para as rotas ficarem mais organizadas e padronizadas.
 
 ### 3.2 Frontend
--Framework: React e Vite
--Estilização: uso de CSS.
--Interatividade: botões para ações.
--Integração: APIs REST para a comunicação entre o frontend e o backend.
+- Framework: React e Vite
+- Estilização: uso de CSS.
+- Interatividade: botões para ações.
+- Integração: APIs REST para a comunicação entre o frontend e o backend.
 
 
 ### 4. Instruções para instalação e execução
