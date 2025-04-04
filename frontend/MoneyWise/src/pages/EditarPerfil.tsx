@@ -48,7 +48,7 @@ export const EditarPerfil = () => {
 
     const handleLogout = () => {
         event.preventDefault(); // Impede o envio do formulário
-    event.stopPropagation();
+        event.stopPropagation();
         localStorage.removeItem('userToken'); // Remove token do usuário
         localStorage.removeItem('userData');  // Remove dados do usuário
         navigate('/MoneyWise'); // Redireciona para a tela de login

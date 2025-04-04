@@ -37,11 +37,14 @@ const OrcamentoMensalERelatorio: React.FC = () => {
     }
     
     const { cpf } = context;
+    const cpfCerto = cpf[0].toString();
 
-    const [ano, setAno] = useState(new Date().getFullYear());
-    const [mes, setMes] = useState("Janeiro");
-    const [valorGasto, setValorGasto] = useState(0);
+    const [ano, setAno] = useState<number>(new Date().getFullYear());
+    const [mes, setMes] = useState<number>(new Date().getMonth() + 1);
+    const [valorGasto, setValorGasto] = useState<{valor_gasto: number}>({ valor_gasto: 0 });
     const [relatorio, setRelatorio] = useState<{ [key: string]: number }>({});
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     const gerarAnos = () => {
         const anoAtual = new Date().getFullYear();
@@ -72,40 +75,55 @@ const OrcamentoMensalERelatorio: React.FC = () => {
     };
 
     useEffect(() => {
-        if (cpf) {
-          buscarOrcamentoMensal();
-          buscarRelatorio();
+        if (cpfCerto) {
+          buscarOrcamentoMensal(ano, mes);
+          buscarRelatorio(ano, mes);
         }
-    }, [cpf, ano, mes]);
+    }, [cpfCerto, ano, mes]);
 
-    const buscarOrcamentoMensal = async () => {
+    const buscarOrcamentoMensal = async (anoEscolhido: number, mesEscolhido: number) => {
+        if(!cpfCerto) return;
+        setLoading(true);
+        setError(null);
         try {
-            const response = await axios.get("http://localhost:5000/api/orcamentoMensal", {
-                params: {
-                login: cpf,
-                ano: ano,
-                mes: mes,
-                },
+            const response = await axios.get('http://localhost:5000/api/orcamentoMensal', {
+                params: { cpf: cpfCerto, ano: anoEscolhido, mes: mesEscolhido },
             });
 
-            setValorGasto(response.data || 0 );;
+            console.log("Resposta da API (orçamento mensal):", response.data);
+
+
+            setValorGasto({ valor_gasto: Number(response.data.valor_gasto) || 0 });
 
         } catch (error) {
             console.error("Erro ao buscar orçamento mensal:", error);
         }
     }
 
-    const buscarRelatorio = async () => {
+
+    
+
+    const buscarRelatorio = async (anoEscolhido: number, mesEscolhido: number) => {
+        if(!cpfCerto) return;
+        setLoading(true);
+        setError(null);
+
+        console.log("Buscando relatório com:", { cpf: cpfCerto, ano: anoEscolhido, mes: mesEscolhido });
+
         try {
-            const response = await axios.get("http://localhost:5000/api/relatorio", {
-                params: { 
-                    login: cpf,
-                    ano: ano,
-                    mes: mes,
+            const response = await axios.get('http://localhost:5000/api/relatorio', {
+                params: { cpf: cpfCerto, ano: anoEscolhido, mes: mesEscolhido},
+                headers: {
+                    "Content-Type": "application/json",
                 },
             });
 
-            setRelatorio(response.data || {});
+            console.log("Resposta da API (relatório):", response.data);
+
+            setRelatorio(response.data.resultados || {});
+
+            console.log("Relatório atualizado:", response.data.resultados);
+
 
         } catch (error) {
             console.error("Erro ao buscar relatório:", error);
@@ -113,7 +131,7 @@ const OrcamentoMensalERelatorio: React.FC = () => {
 
     }
 
-    if (!cpf) {
+    if (!cpfCerto) {
         return <p>Carregando...</p>;
     }
 
@@ -145,7 +163,7 @@ const OrcamentoMensalERelatorio: React.FC = () => {
                             <div className="orcamento-inputs">
                                 <select
                                     value={mes}
-                                    onChange={(e) => setMes((parseInt(e.target.value)).toString())}>
+                                    onChange={(e) => setMes(Number(e.target.value))}>
                                     {gerarMeses().map((mes, index) => (
                                     <option key={index} value={index + 1}>
                                         {mes}
@@ -164,8 +182,12 @@ const OrcamentoMensalERelatorio: React.FC = () => {
                                 </select>
                             </div>
                             </div>
-                            <div className="titulo-valor"><label><img src={valor} className='icon-orcamento'/>Valor total gasto: R$ {valorGasto.toFixed(2)}</label></div>
-                        </div> 
+                            <div className="titulo-valor">
+                                <label>
+                                    <img src={valor} className='icon-orcamento'/>Valor total gasto: R$ {Number(valorGasto.valor_gasto).toFixed(2)}
+                                </label>
+                                </div>
+                            </div> 
                     </div>
             
 
@@ -178,7 +200,7 @@ const OrcamentoMensalERelatorio: React.FC = () => {
                                     {primeiraColuna.map((categoria) => (
                                         <li key={categoria}>
                                             <img src={iconesCategorias[categoria]} alt={categoria}/>
-                                            <span >{categoria}</span> <span className="porcentagem">{((relatorio[categoria] || 0) * 100).toFixed(2)}%</span>
+                                            <span >{categoria}</span> <span className="porcentagem">{(relatorio[categoria] || 0).toFixed(2)}%</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -188,7 +210,7 @@ const OrcamentoMensalERelatorio: React.FC = () => {
                                     {segundaColuna.map((categoria) => (
                                         <li key={categoria}>
                                             <img src={iconesCategorias[categoria]} alt={categoria}/>
-                                            <span >{categoria}</span> <span className="porcentagem">{((relatorio[categoria] || 0)* 100).toFixed(2)}%</span>
+                                            <span >{categoria}</span> <span className="porcentagem">{(relatorio[categoria] || 0).toFixed(2)}%</span>
                                         </li>
                                     ))}
                                 </ul>

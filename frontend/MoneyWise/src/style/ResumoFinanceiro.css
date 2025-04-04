@@ -142,7 +142,7 @@
 }
 
 .selecao-inputs select {
-    padding: 5px 0px;
+    padding: 8px;
     font-size: 18px;
     border: 2px solid #213555;
     border-radius: 5px;
@@ -151,7 +151,7 @@
     cursor: pointer;
     appearance: none;
     width: auto;
-    /*min-width: 200px; /* Ajuste conforme necessário */
+    min-width: 120px; /* Ajuste conforme necessário */
     padding: 5px;
     margin: 0;
     outline: 1px solid blue;
@@ -183,4 +183,22 @@
     text-align: center;
     padding: 15px;
     color: #F5EFE7;
+}
+
+
+@media (max-width: 768px) {
+    .selecao-container {
+        flex-direction: column; /* Empilha os elementos verticalmente */
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .selecao-inputs {
+        flex-direction: column; /* Empilha os selects verticalmente */
+        gap: 10px;
+    }
+
+    .selecao-inputs select {
+        width: 100%; /* Faz os selects ocuparem toda a largura disponível */
+    }
 }

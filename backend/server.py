@@ -612,7 +612,7 @@ def despesas_por_categoria():
     for categoria in categorias:
         query = QueryFactory.select_query(
             table='receita_despesa',
-            columns='SUM(valor)',
+            columns='COALESCE(SUM(valor), 0)',
             where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND categoria = '{categoria}' AND cliente = '{cpf}' AND tipo = 'Despesa'"
         )
 
@@ -751,66 +751,168 @@ def evolucao_despesas():
 
 @app.route('/api/resumoFinanceiro', methods=['GET'])
 def resumo_financeiro():
-    dados = request.json
-    login = dados['login']
-    ano = dados['ano']
-    mes = dados['mes']
+    cpf = request.args.get('cpf', type=str)
+    ano = request.args.get('ano', type=int)
+    mes = request.args.get('mes', type=str)
+
+    print(f"Parâmetros recebidos: CPF={cpf}, Ano={ano}, Mês={mes}")  # Log para depuração
+
+    if not cpf:
+        return jsonify({"error": True, "mensagem": "CPF do usuário não encontrado"}), 400
+
+    if not ano or not mes:
+        return jsonify({"error": "Parâmetros ausentes"}), 400
+    
+
+    meses_dict = {
+    "Janeiro": 1, "Fevereiro": 2, "Março": 3, "Abril": 4,
+    "Maio": 5, "Junho": 6, "Julho": 7, "Agosto": 8,
+    "Setembro": 9, "Outubro": 10, "Novembro": 11, "Dezembro": 12
+    }
+
+    if mes.isdigit():
+        mes = int(mes)  # Se já for um número, converte diretamente
+    else:
+        mes = meses_dict.get(mes) 
+    if mes is None:
+        return jsonify({"error": "Mês inválido"}), 400
+
 
     query = QueryFactory.select_query(
         table='receita_despesa',
-        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes}' AND cliente = '{login}'"
+        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes}' AND cliente = '{cpf}'"
     )
 
+    print("query:", query)  # Log para depuração
+
     resultado = consultar_db(query)
-    #reatar com dataframe os dados
-    return jsonify(resultado)
+    print("resultado:", resultado)
+
+    if not resultado:
+        return jsonify([]) 
+
+    if resultado is None:
+        return jsonify({"error": "Erro ao buscar dados no banco"}), 500
+   
+    resultado_corrigido = [
+        tuple(
+            None if str(valor) == 'None' else float(valor) if isinstance(valor, Decimal) else valor
+            for valor in linha
+        )
+        for linha in resultado
+    ]
+
+    print("Resultado corrigido:", resultado_corrigido)
+
+
+    try:
+        df = pd.DataFrame(resultado_corrigido, columns=['Id', 'Tipo', 'Valor', 'Descricao', 'Categoria', 'Data', 'Cliente'])
+        print("df:", df)
+        return jsonify(df.to_dict(orient='records'))
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 
 
 @app.route('/api/orcamentoMensal', methods=['GET'])
 def orcamento_mensal():
-    dados = request.json
-    login = dados['login']
-    ano = dados['ano']
-    mes = dados['mes']
+    cpf = request.args.get('cpf')
+    ano = request.args.get('ano')
+    mes = request.args.get('mes')
+
+    if not cpf:
+        return jsonify({"error": True, "mensagem": "CPF do usuário não encontrado"}), 400
+
+    if not ano or not mes:
+        return jsonify({"error": "Parâmetros ausentes"}), 400
 
     query = QueryFactory.select_query(
         table='receita_despesa',
-        columns='SUM(valor)',
-        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes}' AND cliente = '{login}' AND tipo = 'Despesa'"
+        columns='COALESCE(SUM(valor), 0)',
+        where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes}' AND cliente = '{cpf}' AND tipo = 'Despesa'"
     )
 
     resultado = consultar_db(query)
+    valor_total_gasto = resultado[0][0] if resultado else 0
 
-    return jsonify(resultado)
+    return jsonify({"valor_gasto": valor_total_gasto})
 
 @app.route('/api/relatorio', methods=['GET'])
 def relatorio_categorias():
-    dados = request.json
-    login = dados['login']
+    try:
+        cpf = request.args.get('cpf')  # Pegando o login via query string
+        ano = request.args.get('ano')
+        mes = request.args.get('mes')
 
-    mes_atual = datetime.now().month
-    ano_atual = datetime.now().year
+        print(f"Parâmetros recebidos: CPF={cpf}, Ano={ano}, Mês={mes}")
 
-    categorias = ['Alimentação', 'Casa', 'Compras', 'Educação', 'Entretenimento', 'Outros', 'Roupa', 'Saúde', 'Transporte', 'Viagens'] 
+        categorias = ['Alimentação', 'Casa', 'Compras', 'Educação', 'Entretenimento', 'Outros', 'Roupa', 'Saúde', 'Transporte', 'Viagens'] 
 
+        categorias_validas = [categoria for categoria in categorias if categoria is not None]
 
-    resultados_categorias = {}
+        if not cpf:
+            return jsonify({"error": True, "mensagem": "CPF do usuário não encontrado"}), 400
+        
+        if not ano or not mes:
+            return jsonify({"error": "Parâmetros ausentes"}), 400
 
-    for categoria in categorias:
-        query = QueryFactory.select_query(
-            table='receita_despesa',
-            columns='SUM(valor)',
-            where_clause=f"EXTRACT(YEAR FROM Data) = '{ano_atual}' AND EXTRACT(MONTH FROM Data) = '{mes_atual}' AND categoria = '{categoria}' AND cliente = '{login}' AND tipo = 'Despesa'"
+        resultados_categorias = {}
+
+        
+        query_total_despesas = QueryFactory.select_query(
+                table='receita_despesa',
+                columns='COALESCE(SUM(valor), 0)',
+                where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes}' AND cliente = '{cpf}' AND tipo = 'Despesa'"
         )
 
-        resultado = consultar_db(query)
+        print(f"Query total despesas: {query_total_despesas}")
 
-        resultado_porcentagem = resultado / despesa_atual()
+        resultado_despesa = consultar_db(query_total_despesas)
+        print(f"Resultado total despesas: {resultado_despesa}")
 
-        resultados_categorias[categoria] = resultado_porcentagem
+        despesa_total = float(resultado_despesa[0][0]) if resultado_despesa and resultado_despesa[0][0] is not None else 0
 
-        return jsonify(resultado)
+        # Evitar divisão por zero
+        if despesa_total == 0:
+            return jsonify({"erro": "Nenhuma despesa encontrada", "resultados": {}}), 200
 
+        for categoria in categorias_validas:
+            query_categoria = QueryFactory.select_query(
+                table='receita_despesa',
+                columns='COALESCE(SUM(valor), 0)',
+                where_clause=f"EXTRACT(YEAR FROM Data) = '{ano}' AND EXTRACT(MONTH FROM Data) = '{mes}' AND categoria = '{categoria}' AND cliente = '{cpf}' AND tipo = 'Despesa'"
+            )
+
+            print(f"Query categoria ({categoria}): {query_categoria}")
+
+
+            resultado_categoria = consultar_db(query_categoria)
+            print(f"Resultado categoria ({categoria}): {resultado_categoria}")
+
+
+            valor_categoria = float(resultado_categoria[0][0]) if resultado_categoria and resultado_categoria[0][0] is not None else 0  # Tratando possíveis valores nulos
+
+            resultado_porcentagem = (valor_categoria /despesa_total) * 100
+
+            resultados_categorias[categoria] = round(resultado_porcentagem, 2)
+
+        df = pd.DataFrame(list(resultados_categorias.items()), columns=['Categoria', 'Porcentagem'])
+
+        print("DataFrame:", df)
+
+        #df['Porcentagem'] = pd.to_numeric(df['Porcentagem'], errors='coerce').fillna(0)
+
+        if df['Porcentagem'].sum() == 0:
+            print("Nenhuma despesa encontrada")
+            
+        return jsonify({
+            "resultados": resultados_categorias,
+        })
+    
+    except Exception as e:
+        print(f"Erro no endpoint /api/relatorio: {e}")
+        return jsonify({"error": "Erro interno no servidor"}), 500
 
 
 

@@ -25,9 +25,12 @@ export const ResumoFinanceiro = () => {
 
     
     const { cpf } = context;
+    const cpfCerto = cpf[0].toString();
     const [ano, setAno] = useState(new Date().getFullYear());
     const [mes, setMes] = useState(new Date().getMonth() + 1/*"Janeiro"*/);
     const [dadosTabela, setDadosTabela] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     
     const gerarAnos = () => {
         const anoAtual = new Date().getFullYear();
@@ -39,20 +42,47 @@ export const ResumoFinanceiro = () => {
         "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
 
+    const meses: { [key: string]: number } = {
+        "Janeiro": 1, "Fevereiro": 2, "Março": 3, "Abril": 4,
+        "Maio": 5, "Junho": 6, "Julho": 7, "Agosto": 8,
+        "Setembro": 9, "Outubro": 10, "Novembro": 11, "Dezembro": 12
+      };
+      
+      
+
+    const fetchResumoFinanceiro = async (anoEscolhido: number, mesEscolhido: string) => {
+        if(!cpfCerto) return;
+        setLoading(true);
+        setError(null);
+
+        const mesNumero = meses[mesEscolhido];
+
+        console.log("mesNumero:", mesNumero);
+        console.log("Parâmetros enviados:", { ano: anoEscolhido, mes: mesNumero, cpf: cpfCerto });
+
+        try{
+            const response = await axios.get('http://127.0.0.1:5000/api/resumoFinanceiro', {
+                params: { ano: anoEscolhido, mes: mesNumero, cpf: cpfCerto },
+            })
+
+            setDadosTabela(response.data);
+        }catch(error) {
+                console.error("Erro ao buscar dados financeiros:", error);
+                setError("Erro ao carregar os dados.");
+        }finally {
+            setLoading(false);
+        }
+    }
+
+    //console.log("Dados recebidos do backend:", response.data);
     
     useEffect(() => {
-        if (!cpf) return;
-        
-        //axios.get(`http://127.0.0.1:5000/api/resumoFinanceiro?cpf=${cpf}&mes=${mes}&ano=${ano}`)
-        axios.get(`http://127.0.0.1:5000/api/resumoFinanceiro`)
-            .then(response => {
-                setDadosTabela(response.data);
-            })
-            .catch(error => {
-                console.error("Erro ao buscar dados financeiros:", error);
-            });
-
+        if(cpfCerto){// Verifica se o CPF está definido antes de fazer a requisição
+            fetchResumoFinanceiro(ano, gerarMeses()[mes - 1]);
+            }
     }, [cpf, mes, ano]);
+
+    
 
     return(
         <div className="telainicio">
@@ -75,14 +105,14 @@ export const ResumoFinanceiro = () => {
                     <div className="selecao-container">
                         <div className="mes-titulo"><label><img src={data} className='icon'/>Mês/Ano:</label></div>
                         <div className="selecao-inputs">
-                            <select 
-                                id="mes" 
-                                value={mes} 
-                                onChange={(e) => setMes(e.target.value)}>
-                                {gerarMeses().map((mes) => (
-                                    <option key={mes} value={mes}>{mes}</option>
-                                ))}
-                            </select>
+                        <select 
+                            id="mes" 
+                            value={mes} 
+                            onChange={(e) => setMes(Number(e.target.value))}>
+                            {Object.entries(meses).map(([nomeMes, numeroMes]) => (
+                                <option key={numeroMes} value={numeroMes}>{nomeMes}</option>
+                            ))}
+                        </select>
                             
                             <label htmlFor="ano"></label>
                             <select 
@@ -100,22 +130,24 @@ export const ResumoFinanceiro = () => {
                     <table className="tabela-resumo">
                         <thead>
                             <tr>
-                                <th>Data</th>
+                                {/*<th>ID</th>*/}
                                 <th>Tipo</th>
                                 <th>Valor</th>
                                 <th>Descrição</th>
                                 <th>Categoria</th>
+                                <th>Data</th>
                             </tr>
                         </thead>
                         <tbody>
                             {dadosTabela.length > 0 ? (
                                 dadosTabela.map((item, index) => ( 
                                     <tr key={index}>
-                                        <td>{item.data}</td>
-                                        <td>{item.tipo}</td>
-                                        <td>R$ {item.valor}</td>
-                                        <td>{item.descricao}</td>
-                                        <td>{item.categoria}</td>
+                                        {/*<td>{item.ID}</td>*/}
+                                        <td>{item.Tipo}</td>
+                                        <td>R$ {item.Valor}</td>
+                                        <td>{item.Descricao}</td>
+                                        <td>{item.Categoria}</td>
+                                        <td>{new Date(item.Data).toLocaleDateString('pt-BR')}</td>
                                     </tr>
                                 ))
                             ) : (
